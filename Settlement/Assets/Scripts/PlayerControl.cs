@@ -3,7 +3,7 @@ using System.Collections;
 
 public class PlayerControl : MonoBehaviour {
 
-	public Transform building;
+	public Transform woodcutter;
 
 	// Use this for initialization
 	void Start () {
@@ -14,7 +14,7 @@ public class PlayerControl : MonoBehaviour {
 	void Update () {
 
 		if (Input.GetKeyDown(KeyCode.Q)){
-			Instantiate(building, new Vector3(0,0,0), Quaternion.identity);
+			Instantiate(woodcutter, new Vector3(0,0,0), Quaternion.identity);
 		}
 
 	}
