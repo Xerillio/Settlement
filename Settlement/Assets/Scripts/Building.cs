@@ -1,5 +1,5 @@
 ﻿using UnityEngine;
-using System.Collections;
+using System.Collections.Generic;
 using System;
 
 public class Building : MonoBehaviour {
@@ -9,7 +9,8 @@ public class Building : MonoBehaviour {
 	/// </summary>
 	private bool isStatic = false;
 
-	private Type buildingType;
+	private string buildingType;
+	public void SetBuildingType(string type) { this.buildingType = type; }
 
 	// Use this for initialization
 	void Start () {
@@ -28,7 +29,14 @@ public class Building : MonoBehaviour {
 		// LMB clicked
 		if (Input.GetMouseButtonDown(0)){
 			this.isStatic = true;
-			this.GetComponent<buildingType>().enabled = true;
+			MonoBehaviour[] scripts = this.GetComponents<MonoBehaviour>();
+			for (int i = 0; i < scripts.Length; i++)
+			{
+				if (scripts[i].GetType().ToString() == this.buildingType){
+					scripts[i].enabled = true;
+					this.enabled = false;
+				}
+			}
 		}
 	}
 

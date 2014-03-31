@@ -14,7 +14,8 @@ public class PlayerControl : MonoBehaviour {
 	void Update () {
 
 		if (Input.GetKeyDown(KeyCode.Q)){
-			Instantiate(woodcutter, new Vector3(0,0,0), Quaternion.identity);
+			Object instance = Instantiate(woodcutter, new Vector3(0,0,0), Quaternion.identity);
+			((Transform)instance).GetComponent<Building>().SetBuildingType("WoodcutterBuilding");
 		}
 
 	}

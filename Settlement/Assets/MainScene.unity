@@ -165,9 +165,10 @@ GameObject:
   - 33: {fileID: 254417623}
   - 136: {fileID: 254417622}
   - 23: {fileID: 254417621}
-  m_Layer: 0
+  - 114: {fileID: 254417625}
+  m_Layer: 8
   m_Name: Tree
-  m_TagString: Untagged
+  m_TagString: Wood
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -227,6 +228,18 @@ Transform:
   m_LocalScale: {x: .5, y: 2.475986, z: .5}
   m_Children: []
   m_Father: {fileID: 0}
+--- !u!114 &254417625
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 11400000, guid: b969e8185bd8c4845bc8678846232998,
+    type: 2}
+  m_PrefabInternal: {fileID: 1919728701}
+  m_GameObject: {fileID: 254417620}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c3442e172615b854e823769fa3946eea, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &928549581
 GameObject:
   m_ObjectHideFlags: 0
