@@ -2,15 +2,10 @@
 using System.Collections.Generic;
 using System;
 
-public class Building : MonoBehaviour {
+public class BuildingPlacer : MonoBehaviour {
 
-	/// <summary>
-	/// True when the building has been placed.
-	/// </summary>
-	private bool isStatic = false;
-
-	private string buildingType;
-	public void SetBuildingType(string type) { this.buildingType = type; }
+	private Type buildingType;
+	public void SetBuildingType<T>() { this.buildingType = typeof(T); }
 
 	// Use this for initialization
 	void Start () {
@@ -20,19 +15,15 @@ public class Building : MonoBehaviour {
 	
 	// Update is called once per frame
 	void Update () {
-		if (this.isStatic)
-			return;
-
 		Vector3 placement = this.TerrainMousePoint();
 		this.transform.position = placement.Equals(new Vector3(-1, -1, -1)) ? this.transform.position : placement;
 
 		// LMB clicked
 		if (Input.GetMouseButtonDown(0)){
-			this.isStatic = true;
 			MonoBehaviour[] scripts = this.GetComponents<MonoBehaviour>();
 			for (int i = 0; i < scripts.Length; i++)
 			{
-				if (scripts[i].GetType().ToString() == this.buildingType){
+				if (scripts[i].GetType() == this.buildingType){
 					scripts[i].enabled = true;
 					this.enabled = false;
 				}

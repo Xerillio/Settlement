@@ -24,27 +24,28 @@ public class WoodcutterBuilding : MonoBehaviour {
 		this.myVillager = Instantiate(myVillager, this.transform.position, Quaternion.identity) as Transform;
 		this.myVillager.GetComponent<WoodcutterVillager>().SetMyBuilding(this);
 	}
-	
-	// Update is called once per frame
-	void Update () {
-		
-	}
 
 	/// <summary>
 	/// Finds the tree that is closest to this building.
 	/// </summary>
 	/// <returns>Returns that tree.</returns>
 	public Transform GetClosestTree() {
-		if (this.treesInRange.Count == 0)
+		// If there are no trees in range
+		if (this.treesInRange.Count == 0 || (this.treesInRange.Count == 1 && this.treesInRange[0] == null))
 			return null;
 
 		Transform closest = this.treesInRange[0];
 		float dist = 1000.0f;
-		foreach (Transform elem in this.treesInRange) {
-			float tmpDist = (this.transform.position - elem.position).magnitude;
-			if (tmpDist < dist){
-				dist = tmpDist;
-				closest = elem;
+		for (int i = 0; i < this.treesInRange.Count; i++) {
+			if (this.treesInRange[i] == null) {
+				this.treesInRange.RemoveAt(i);
+			}
+			else {
+				float tmpDist = (this.transform.position - this.treesInRange[i].position).magnitude;
+				if (tmpDist < dist) {
+					dist = tmpDist;
+					closest = this.treesInRange[i];
+				}
 			}
 		}
 		return closest;

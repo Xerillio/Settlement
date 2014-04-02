@@ -12,11 +12,10 @@ public class PlayerControl : MonoBehaviour {
 	
 	// Update is called once per frame
 	void Update () {
-
+		// Instantiate a woodcutter building on Q pressed
 		if (Input.GetKeyDown(KeyCode.Q)){
 			Object instance = Instantiate(woodcutter, new Vector3(0,0,0), Quaternion.identity);
-			((Transform)instance).GetComponent<Building>().SetBuildingType("WoodcutterBuilding");
+			((Transform)instance).GetComponent<BuildingPlacer>().SetBuildingType<WoodcutterBuilding>();
 		}
-
 	}
 }
