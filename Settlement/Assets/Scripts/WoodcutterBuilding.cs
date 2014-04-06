@@ -56,15 +56,17 @@ public class WoodcutterBuilding : MonoBehaviour {
 		}
 	}
 
-	private void CheckTreesInRange() {
+	private bool CheckTreesInRange() {
 		// Find trees in range of the building and save a reference to them in "treesInRange"
 		int mask = 1 << LayerMask.NameToLayer("Terrain");
 		Collider[] hits = Physics.OverlapSphere(this.transform.position, this.checkRadius, mask);
+		bool foundSome = hits.Length > 0;
 		for (int i = 0; i < hits.Length; i++) {
 			if (hits[i].tag == "Wood") {
 				this.treesInRange.Add(hits[i].transform);
 			}
 		}
+		return foundSome;
 	}
 
 	/// <summary>
@@ -82,6 +84,7 @@ public class WoodcutterBuilding : MonoBehaviour {
 			Transform elem = this.treesInRange[i];
 			if (elem == null) {
 				this.treesInRange.RemoveAt(i);
+				i--;
 			}
 			else {
 				float tmpDist = (this.transform.position - elem.position).magnitude;

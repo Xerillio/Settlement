@@ -46,7 +46,6 @@ public class WoodCollector : MonoBehaviour {
 				if ((Time.realtimeSinceStartup - elem.lastCollectionTime) * elem.collectionSpeed >= 100.0f) {
 					elem.lastCollectionTime += 100.0f / elem.collectionSpeed;
 					this.woodLeft--;
-					Debug.Log(this.woodLeft + " time: " + Time.realtimeSinceStartup);
 					if (this.woodLeft == 0)
 						Destroy(this.gameObject);
 					return 1;

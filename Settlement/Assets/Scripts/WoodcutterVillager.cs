@@ -8,13 +8,17 @@ public class WoodcutterVillager : Villager {
 	/// </summary>
 	private bool isCollecting = false;
 	/// <summary>
+	/// True if the woocutter is near the tree he's collecting from.
+	/// </summary>
+	private bool isNearTree = false;
+	/// <summary>
 	/// True if the woodcutter just cut down a tree.
 	/// </summary>
 	private int heldWood = 0;
 	/// <summary>
 	/// The speed at which the woodcutter is collecting wood.
 	/// </summary>
-	private float collectionSpeed = 20.0f;
+	private float collectionSpeed = 40.0f;
 	/// <summary>
 	/// The tree (script) currently being chopped down.
 	/// </summary>
@@ -41,17 +45,20 @@ public class WoodcutterVillager : Villager {
 				this.heldWood = 0;
 		}
 		else if (this.targetTree == null){
-			Debug.Log("Find new tree");
 			if ((this.targetTree = this.myBuilding.GetClosestTree()) == null) {
-				Debug.Log("No more trees");
 				this.isCollecting = false;
 				if (this.MoveToPosition(this.myBuilding.transform.position, 0.2f)) {
 					this.myBuilding.AwaitNewTrees(this);
 				}
 			}
+			else {
+				this.isNearTree = false;
+			}
 		}
-		else if (!this.isCollecting) {
-			if (this.isCollecting = this.MoveToPosition(this.targetTree.position, 1.0f)) {
+		else if (!this.isNearTree) {
+			if (this.MoveToPosition(this.targetTree.position, 1.0f)) {
+				this.isNearTree = true;
+				this.isCollecting = true;
 				if (this.activeTreeScript == null) {
 					this.activeTreeScript = this.GetTreeScript();
 				}
@@ -64,22 +71,6 @@ public class WoodcutterVillager : Villager {
 	}
 
 	private void Collect() {
-		if (this.activeTreeScript == null) {
-			this.activeTreeScript = this.GetTreeScript();
-		}
-		/*
-		if (this.activeTreeScript == null) {
-			this.activeTreeScript = this.GetTreeScript();
-			if (!script.Equals(this.activeTreeScript))
-				this.activeTreeScript = script;
-			else {
-				Destroy(this.targetTree.gameObject);
-				Debug.Log(this.activeTreeScript == null);
-				return;
-			}
-		}
-		*/
-
 		if ((this.heldWood += this.activeTreeScript.Chop(this)) == 2) {
 			this.activeTreeScript.StopCollection(this);
 			this.isCollecting = false;
