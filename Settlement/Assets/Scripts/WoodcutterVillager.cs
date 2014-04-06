@@ -18,7 +18,7 @@ public class WoodcutterVillager : Villager {
 	/// <summary>
 	/// The tree (script) currently being chopped down.
 	/// </summary>
-	private WoodCollector activeTree = null;
+	private WoodCollector activeTreeScript = null;
 	/// <summary>
 	/// The target tree currently collecting from.
 	/// </summary>
@@ -37,30 +37,53 @@ public class WoodcutterVillager : Villager {
 	// Update is called once per frame
 	void Update () {
 		if (this.heldWood > 0 && !this.isCollecting) {
-			if (!this.MoveToPosition(this.myBuilding.transform.position, 0.0f))
+			if (this.MoveToPosition(this.myBuilding.transform.position, 0.0f))
 				this.heldWood = 0;
 		}
 		else if (this.targetTree == null){
-			this.targetTree = this.myBuilding.GetClosestTree();						// If the tree breakes but heldWood != 5, what then??
+			Debug.Log("Find new tree");
+			if ((this.targetTree = this.myBuilding.GetClosestTree()) == null) {
+				Debug.Log("No more trees");
+				this.isCollecting = false;
+				if (this.MoveToPosition(this.myBuilding.transform.position, 0.2f)) {
+					this.myBuilding.AwaitNewTrees(this);
+				}
+			}
 		}
 		else if (!this.isCollecting) {
-			this.isCollecting = this.MoveToPosition(this.targetTree.position, 1.0f);
+			if (this.isCollecting = this.MoveToPosition(this.targetTree.position, 1.0f)) {
+				if (this.activeTreeScript == null) {
+					this.activeTreeScript = this.GetTreeScript();
+				}
+				this.activeTreeScript.StartCollection(this, this.collectionSpeed);
+			}
 		}
-		else {
+		else if (this.isCollecting) {
 			this.Collect();
 		}
 	}
 
 	private void Collect() {
-		if (this.activeTree == null)
-			this.activeTree = this.GetTreeScript();
-
-		if (this.activeTree.GetWoodLeft() == 0) {
-			Destroy(this.activeTree.gameObject);
-			return;
+		if (this.activeTreeScript == null) {
+			this.activeTreeScript = this.GetTreeScript();
 		}
-		if ((this.heldWood += this.activeTree.Chop(this)) == 5)
+		/*
+		if (this.activeTreeScript == null) {
+			this.activeTreeScript = this.GetTreeScript();
+			if (!script.Equals(this.activeTreeScript))
+				this.activeTreeScript = script;
+			else {
+				Destroy(this.targetTree.gameObject);
+				Debug.Log(this.activeTreeScript == null);
+				return;
+			}
+		}
+		*/
+
+		if ((this.heldWood += this.activeTreeScript.Chop(this)) == 2) {
+			this.activeTreeScript.StopCollection(this);
 			this.isCollecting = false;
+		}
 	}
 
 	private WoodCollector GetTreeScript() {

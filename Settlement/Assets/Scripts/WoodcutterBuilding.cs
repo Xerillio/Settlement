@@ -4,25 +4,67 @@ using System.Collections.Generic;
 
 public class WoodcutterBuilding : MonoBehaviour {
 
+	private class Worker {
+		public WoodcutterVillager villager;
+		public WorkingState state;
+
+		public Worker(WoodcutterVillager villager){
+			this.villager = villager;
+			this.state = WorkingState.Working;
+		}
+
+		public Worker(WoodcutterVillager villager, WorkingState state) {
+			this.villager = villager;
+			this.state = state;
+		}
+	}
+
+	private enum WorkingState {
+		Waiting,
+		Working
+	}
+
+	private List<Worker> myWorkers = new List<Worker>();
+
 	public Transform myVillager;
 
 	private float checkRadius = 30.0f;
+
+	private float lastCheckTime = 0.0f;
+
+	private float checkRate = 2.0f;
 
 	private List<Transform> treesInRange = new List<Transform>();
 
 	// Use this for initialization
 	void Start () {
+		this.enabled = false;
+		Debug.Log("WoodBuilding Start");
+		this.CheckTreesInRange();
+
+		WoodcutterVillager villager = (Instantiate(myVillager, this.transform.position, Quaternion.identity) as Transform).GetComponent<WoodcutterVillager>();
+		villager.SetMyBuilding(this);
+		this.myWorkers.Add(new Worker(villager, WorkingState.Working));
+	}
+
+	void Update() {
+		Debug.Log("Building update");
+		float time = Time.realtimeSinceStartup;
+		if (time - this.lastCheckTime > this.checkRate) {
+			this.lastCheckTime = time + this.checkRate;
+			this.CheckTreesInRange();
+		}
+	}
+
+	private void CheckTreesInRange() {
 		// Find trees in range of the building and save a reference to them in "treesInRange"
 		int mask = 1 << LayerMask.NameToLayer("Terrain");
 		Collider[] hits = Physics.OverlapSphere(this.transform.position, this.checkRadius, mask);
-		for (int i = 0; i < hits.Length; i++)
-		{
+		for (int i = 0; i < hits.Length; i++) {
 			if (hits[i].tag == "Wood") {
 				this.treesInRange.Add(hits[i].transform);
 			}
 		}
-		this.myVillager = Instantiate(myVillager, this.transform.position, Quaternion.identity) as Transform;
-		this.myVillager.GetComponent<WoodcutterVillager>().SetMyBuilding(this);
 	}
 
 	/// <summary>
@@ -37,17 +79,29 @@ public class WoodcutterBuilding : MonoBehaviour {
 		Transform closest = this.treesInRange[0];
 		float dist = 1000.0f;
 		for (int i = 0; i < this.treesInRange.Count; i++) {
-			if (this.treesInRange[i] == null) {
+			Transform elem = this.treesInRange[i];
+			if (elem == null) {
 				this.treesInRange.RemoveAt(i);
 			}
 			else {
-				float tmpDist = (this.transform.position - this.treesInRange[i].position).magnitude;
+				float tmpDist = (this.transform.position - elem.position).magnitude;
 				if (tmpDist < dist) {
 					dist = tmpDist;
-					closest = this.treesInRange[i];
+					closest = elem;
 				}
 			}
 		}
 		return closest;
+	}
+
+	public void AwaitNewTrees(WoodcutterVillager villager){
+		for (int i = 0; i < this.myWorkers.Count; i++) {
+			Worker elem = this.myWorkers[i];
+			if (elem.villager.Equals(villager)) {
+				elem.villager.enabled = false;
+				elem.state = WorkingState.Waiting;
+				this.enabled = true;
+			}
+		}
 	}
 }

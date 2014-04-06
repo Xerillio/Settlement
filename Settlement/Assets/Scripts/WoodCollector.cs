@@ -19,7 +19,7 @@ public class WoodCollector : MonoBehaviour {
 		}
 	}
 
-	private int woodLeft = 10;
+	private int woodLeft = 1;
 	public int GetWoodLeft() { return this.woodLeft; }
 	List<Collector> collectors = new List<Collector>();
 
@@ -31,6 +31,14 @@ public class WoodCollector : MonoBehaviour {
 		this.collectors.Add(new Collector(villager, collectionSpeed));
 	}
 
+	public void StopCollection(WoodcutterVillager villager) {
+		for (int i = 0; i < this.collectors.Count; i++) {
+			Collector elem = this.collectors[i];
+			if (elem.villager.Equals(villager))
+				this.collectors.RemoveAt(i);
+		}
+	}
+
 	public int Chop(WoodcutterVillager villager) {
 		for (int i = 0; i < this.collectors.Count; i++) {
 			Collector elem = this.collectors[i];
@@ -38,6 +46,9 @@ public class WoodCollector : MonoBehaviour {
 				if ((Time.realtimeSinceStartup - elem.lastCollectionTime) * elem.collectionSpeed >= 100.0f) {
 					elem.lastCollectionTime += 100.0f / elem.collectionSpeed;
 					this.woodLeft--;
+					Debug.Log(this.woodLeft + " time: " + Time.realtimeSinceStartup);
+					if (this.woodLeft == 0)
+						Destroy(this.gameObject);
 					return 1;
 				}
 				return 0;
