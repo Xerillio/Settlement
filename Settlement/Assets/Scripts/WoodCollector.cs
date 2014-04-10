@@ -39,7 +39,7 @@ public class WoodCollector : MonoBehaviour {
 		}
 	}
 
-	public int Chop(WoodcutterVillager villager) {
+	public uint Chop(WoodcutterVillager villager) {
 		for (int i = 0; i < this.collectors.Count; i++) {
 			Collector elem = this.collectors[i];
 			if (elem.villager.Equals(villager)) {

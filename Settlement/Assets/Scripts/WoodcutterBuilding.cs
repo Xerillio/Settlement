@@ -3,14 +3,16 @@ using System.Collections;
 using System.Collections.Generic;
 
 public class WoodcutterBuilding : MonoBehaviour {
-
+	/// <summary>
+	/// A villager connected to this building. Keeps track of his working status.
+	/// </summary>
 	private class Worker {
 		public WoodcutterVillager villager;
 		public WorkingState state;
 
 		public Worker(WoodcutterVillager villager){
 			this.villager = villager;
-			this.state = WorkingState.Working;
+			this.state = WorkingState.Collecting;
 		}
 
 		public Worker(WoodcutterVillager villager, WorkingState state) {
@@ -18,17 +20,26 @@ public class WoodcutterBuilding : MonoBehaviour {
 			this.state = state;
 		}
 	}
-
+	/// <summary>
+	/// States in which a worker can be.
+	/// </summary>
 	private enum WorkingState {
 		Waiting,
-		Working
+		Collecting,
+		Delivering
 	}
-
+	/// <summary>
+	/// The distance the building is searching for trees.
+	/// </summary>
+	private static float checkRadius = 30.0f;
+	/// <summary>
+	/// List of all workers connected to this building.
+	/// </summary>
 	private List<Worker> myWorkers = new List<Worker>();
-
+	/// <summary>
+	/// TEMP. Used to instantiate a villager on creation of the building.
+	/// </summary>
 	public Transform myVillager;
-
-	private float checkRadius = 30.0f;
 
 	private float lastCheckTime = 0.0f;
 
@@ -36,19 +47,21 @@ public class WoodcutterBuilding : MonoBehaviour {
 
 	private List<Transform> treesInRange = new List<Transform>();
 
+	private static uint woodCap = 5;
+
+	private uint stockedWood = 0;
+
 	// Use this for initialization
 	void Start () {
 		this.enabled = false;
-		Debug.Log("WoodBuilding Start");
 		this.CheckTreesInRange();
 
 		WoodcutterVillager villager = (Instantiate(myVillager, this.transform.position, Quaternion.identity) as Transform).GetComponent<WoodcutterVillager>();
 		villager.SetMyBuilding(this);
-		this.myWorkers.Add(new Worker(villager, WorkingState.Working));
+		this.myWorkers.Add(new Worker(villager, WorkingState.Collecting));
 	}
 
 	void Update() {
-		Debug.Log("Building update");
 		float time = Time.realtimeSinceStartup;
 		if (time - this.lastCheckTime > this.checkRate) {
 			this.lastCheckTime = time + this.checkRate;
@@ -59,7 +72,7 @@ public class WoodcutterBuilding : MonoBehaviour {
 	private bool CheckTreesInRange() {
 		// Find trees in range of the building and save a reference to them in "treesInRange"
 		int mask = 1 << LayerMask.NameToLayer("Terrain");
-		Collider[] hits = Physics.OverlapSphere(this.transform.position, this.checkRadius, mask);
+		Collider[] hits = Physics.OverlapSphere(this.transform.position, WoodcutterBuilding.checkRadius, mask);
 		bool foundSome = hits.Length > 0;
 		for (int i = 0; i < hits.Length; i++) {
 			if (hits[i].tag == "Wood") {
@@ -105,6 +118,16 @@ public class WoodcutterBuilding : MonoBehaviour {
 				elem.state = WorkingState.Waiting;
 				this.enabled = true;
 			}
+		}
+	}
+
+	public bool AddWood(uint amount) {
+		if (this.stockedWood + amount >= WoodcutterBuilding.woodCap) {
+			return false;
+		}
+		else {
+			this.stockedWood += amount;
+			return true;
 		}
 	}
 }

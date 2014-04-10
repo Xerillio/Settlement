@@ -4,6 +4,10 @@ using System.Collections;
 public class WoodcutterVillager : Villager {
 
 	/// <summary>
+	/// True if the woodcutter is delivering wood to the storehouse.
+	/// </summary>
+	private bool isDelivering = false;
+	/// <summary>
 	/// True if the woodcutter is collecting wood.
 	/// </summary>
 	private bool isCollecting = false;
@@ -14,11 +18,11 @@ public class WoodcutterVillager : Villager {
 	/// <summary>
 	/// True if the woodcutter just cut down a tree.
 	/// </summary>
-	private int heldWood = 0;
+	private uint heldWood = 0;
 	/// <summary>
 	/// The speed at which the woodcutter is collecting wood.
 	/// </summary>
-	private float collectionSpeed = 40.0f;
+	private static float collectionSpeed = 40.0f;
 	/// <summary>
 	/// The tree (script) currently being chopped down.
 	/// </summary>
@@ -41,8 +45,15 @@ public class WoodcutterVillager : Villager {
 	// Update is called once per frame
 	void Update () {
 		if (this.heldWood > 0 && !this.isCollecting) {
-			if (this.MoveToPosition(this.myBuilding.transform.position, 0.0f))
-				this.heldWood = 0;
+			if (this.isDelivering) {
+				// Move to the nearest storehouse
+			}
+			else if (this.MoveToPosition(this.myBuilding.transform.position, 0.0f)) {
+				if (this.myBuilding.AddWood(this.heldWood))
+					this.heldWood = 0;
+				else
+					this.isDelivering = true;
+			}
 		}
 		else if (this.targetTree == null){
 			if ((this.targetTree = this.myBuilding.GetClosestTree()) == null) {
@@ -62,7 +73,7 @@ public class WoodcutterVillager : Villager {
 				if (this.activeTreeScript == null) {
 					this.activeTreeScript = this.GetTreeScript();
 				}
-				this.activeTreeScript.StartCollection(this, this.collectionSpeed);
+				this.activeTreeScript.StartCollection(this, WoodcutterVillager.collectionSpeed);
 			}
 		}
 		else if (this.isCollecting) {
